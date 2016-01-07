@@ -1,0 +1,7 @@
+autobahn>=0.10.9
+pyOpenSSL>=0.13.1
+requests>=2.8.1
+Twisted>=13.2.0
+txaio>=2.0.4
+pyaudio>=0.2.9
+pyyaml>=3.08
