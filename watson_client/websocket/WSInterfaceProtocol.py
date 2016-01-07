@@ -4,53 +4,39 @@ import os  # for listing directories
 # WebSockets
 from autobahn.twisted.websocket import WebSocketClientProtocol, connectWS
 from twisted.internet import ssl
+from config.Config import Config
 
 
 # WebSockets interface to the STT service
 # note: an object of this class is created for each WebSocket connection, every time we call connectWS
 class WSInterfaceProtocol(WebSocketClientProtocol):
-    def __init__(self, factory, queue, summary, dirOutput, contentType):
+    def __init__(self, factory, audioFd, summary, contentType):
+        self.audioFd = audioFd
         self.factory = factory
-        self.queue = queue
         self.summary = summary
-        self.dirOutput = dirOutput
         self.contentType = contentType
         self.packetRate = 20
         self.listeningMessages = 0
         self.timeFirstInterim = -1
         self.bytesSent = 0
-        self.chunkSize = 2000  # in bytes
+        self.chunkSize = Config.Instance().getAudioChunk()  # in bytes
         super(self.__class__, self).__init__()
-        print dirOutput
-        print "contentType: " + str(self.contentType) + " queueSize: " + str(self.queue.qsize())
+        print "contentType: " + str(self.contentType)
 
-    def setUtterance(self, utt):
+    def setUtterance(self):
 
-        self.uttNumber = utt[0]
-        self.uttFilename = utt[1]
-        self.summary[self.uttNumber] = {"hypothesis": "",
-                                        "status": {"code": "", "reason": ""}}
-        self.fileJson = self.dirOutput + "/" + str(self.uttNumber) + ".json.txt"
-        try:
-            os.remove(self.fileJson)
-        except OSError:
-            pass
+        self.summary = {"hypothesis": "",
+                        "status": {"code": "", "reason": ""}}
 
     # helper method that sends a chunk of audio if needed (as required what the specified pacing is)
-    def maybeSendChunk(self, data):
+    def maybeSendChunk(self):
 
         def sendChunk(chunk, final=False):
-            self.bytesSent += len(chunk)
             self.sendMessage(chunk, isBinary=True)
-            if final:
-                self.sendMessage(b'', isBinary=True)
 
-        if (self.bytesSent + self.chunkSize >= len(data)):
-            if (len(data) > self.bytesSent):
-                sendChunk(data[self.bytesSent:len(data)], True)
-                return
-        sendChunk(data[self.bytesSent:self.bytesSent + self.chunkSize])
-        self.factory.reactor.callLater(0.01, self.maybeSendChunk, data=data)
+        chunk = os.read(self.audioFd, self.chunkSize)
+        sendChunk(chunk)
+        self.factory.reactor.callLater(0.01, self.maybeSendChunk)
         return
 
     def onConnect(self, response):
@@ -66,13 +52,9 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
         print "sendMessage(init)"
         # send the initialization parameters
         self.sendMessage(json.dumps(data).encode('utf8'))
-
         # start sending audio right away (it will get buffered in the STT service)
-        print self.uttFilename
-        f = open(str(self.uttFilename), 'rb')
         self.bytesSent = 0
-        dataFile = f.read()
-        self.maybeSendChunk(dataFile)
+        self.maybeSendChunk()
         print "onOpen ends"
 
     def onMessage(self, payload, isBinary):
@@ -100,17 +82,12 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
                     print "empty hypothesis!"
                 # regular hypothesis
                 else:
-                    # dump the message to the output directory
-                    jsonObject = json.loads(payload.decode('utf8'))
-                    f = open(self.fileJson, "a")
-                    f.write(json.dumps(jsonObject, indent=4, sort_keys=True))
-                    f.close()
 
                     hypothesis = jsonObject['results'][0]['alternatives'][0]['transcript']
                     bFinal = (jsonObject['results'][0]['final'] == True)
                     if bFinal:
                         print "final hypothesis: \"" + hypothesis + "\""
-                        self.summary[self.uttNumber]['hypothesis'] += hypothesis
+                        self.summary['hypothesis'] += hypothesis
                     else:
                         print "interim hyp: \"" + hypothesis + "\""
 
@@ -119,13 +96,10 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
         print("onClose")
         print(
             "WebSocket connection closed: {0}".format(reason), "code: ", code, "clean: ", wasClean, "reason: ", reason)
-        self.summary[self.uttNumber]['status']['code'] = code
-        self.summary[self.uttNumber]['status']['reason'] = reason
+        self.summary['status']['code'] = code
+        self.summary['status']['reason'] = reason
         if (code == 1000):
-            self.summary[self.uttNumber]['status']['successful'] = True
-
-        # create a new WebSocket connection if there are still utterances in the queue that need to be processed
-        self.queue.task_done()
+            self.summary['status']['successful'] = True
 
         if self.factory.prepareUtterance() == False:
             return

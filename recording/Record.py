@@ -3,21 +3,25 @@
 import pyaudio
 import wave
 import os
+import threading
+import StringIO
+from config.Config import Config
 
 
-class Record:
-    CHUNK = 2000
+class Record(threading.Thread):
+    CHUNK = Config.Instance().getAudioChunk()
     FORMAT = pyaudio.paInt16
     CHANNELS = 2
     RATE = 44100
-    RECORD_SECONDS = 5
-    WAVE_OUTPUT_FILENAME = "output.wav"
+    stopper = None
 
-    def __init__(self):
+    def __init__(self, writer, stopper):
+        threading.Thread.__init__(self)
         self.p = pyaudio.PyAudio()
+        self.writer = writer
+        self.stopper = stopper
 
-    def recording(self, writer):
-
+    def recording(self):
         stream = self.p.open(format=self.FORMAT,
                              channels=self.CHANNELS,
                              rate=self.RATE,
@@ -25,20 +29,23 @@ class Record:
                              frames_per_buffer=self.CHUNK)
 
         print("* recording")
-        while(True):
-            os.write(writer, stream.read(self.CHUNK))
+        while not self.stopper.is_set():
+            os.write(self.writer, stream.read(self.CHUNK, False))
         stream.stop_stream()
         stream.close()
         self.p.terminate()
+        print 'finished recording'
 
-#    def write_wav_file(self):
-#        wf = wave.open(self.WAVE_OUTPUT_FILENAME, 'wb')
-#        wf.setnchannels(self.CHANNELS)
-#        wf.setsampwidth(self.p.get_sample_size(self.FORMAT))
-#        wf.setframerate(self.RATE)
-#        wf.writeframes(b''.join(self.frames))
-#        wf.close()
+    def write_wav_file(self, data):
+        buffer = StringIO.StringIO()
+        wf = wave.open(buffer, 'wb')
+        wf.setnchannels(self.CHANNELS)
+        wf.setsampwidth(self.p.get_sample_size(self.FORMAT))
+        wf.setframerate(self.RATE)
+        wf.writeframes(data)
+        wf.close()
+        buffer.flush()
+        return buffer.getvalue()
 
-    def start(self):
+    def run(self):
         self.recording()
-        self.write_wav_file()

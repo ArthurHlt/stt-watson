@@ -12,3 +12,6 @@ class Config:
 
     def getWatsonConfig(self):
         return self.yamlConfig["watson-stt"]
+
+    def getAudioChunk(self):
+        return self.yamlConfig["audio-chunk"]

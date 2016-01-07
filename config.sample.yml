@@ -1,9 +1,8 @@
+audio-chunk: 8000 #audio data to send (size in bytes)
 watson-stt:
   user: user-uuid
   password: passs
   model: en-US_BroadbandModel
-  fileInput: ./recordings.txt
-  dirOutput: ./output
-  contentType: audio/wav
+  contentType: audio/l16;rate=44100 # touch only if you know what you're doing
   threads: 1
   tokenauth: ~
