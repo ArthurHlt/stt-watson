@@ -1,6 +1,6 @@
 watson-stt:
-  user: dfd80521-573d-489d-bade-d6efe4c133b5
-  password: Il60FdAmJX7o
+  user: user-uuid
+  password: passs
   model: en-US_BroadbandModel
   fileInput: ./recordings.txt
   dirOutput: ./output
