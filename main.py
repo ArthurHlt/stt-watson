@@ -13,7 +13,6 @@ workers = [record]
 
 handler = SignalHandler(stopper, workers)
 signal.signal(signal.SIGINT, handler)
-
 record.start()
 # while True:
 #    os.read(audioFd, 2000)

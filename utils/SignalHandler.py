@@ -1,4 +1,6 @@
 import sys
+import os
+import signal
 
 
 class SignalHandler:
@@ -25,5 +27,6 @@ class SignalHandler:
         self.stopper.set()
         for worker in self.workers:
             worker.join()
-
+        os.kill(os.getpid(),
+                signal.SIGKILL)  # force kill for now when receving sigint (thread is stopped gracefully anyway)
         sys.exit(0)
