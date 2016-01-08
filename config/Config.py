@@ -18,3 +18,6 @@ class Config:
 
     def getAudioRate(self):
         return self.yamlConfig["audio-rate"]
+
+    def getChannels(self):
+        return self.yamlConfig["channels"]
