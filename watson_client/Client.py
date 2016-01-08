@@ -32,6 +32,8 @@ from twisted.internet import ssl, reactor
 
 
 class Client:
+    CONTENT_TYPE = 'audio/l16;rate=44100'
+
     def __init__(self):
         self.configData = Config.Instance().getWatsonConfig()
 
@@ -58,19 +60,17 @@ class Client:
         summary = {}
         factory = WSInterfaceFactory(audioFd,
                                      summary,
-                                     self.configData["contentType"],
+                                     self.CONTENT_TYPE,
                                      self.configData["model"],
                                      url,
                                      headers,
                                      debug=True)
         factory.protocol = WSInterfaceProtocol
 
-        for i in range(int(self.configData["threads"])):
-            # SSL client context: default
-            if factory.isSecure:
-                contextFactory = ssl.ClientContextFactory()
-            else:
-                contextFactory = None
-            connectWS(factory, contextFactory)
+        if factory.isSecure:
+            contextFactory = ssl.ClientContextFactory()
+        else:
+            contextFactory = None
+        connectWS(factory, contextFactory)
 
         reactor.run()

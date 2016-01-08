@@ -15,3 +15,6 @@ class Config:
 
     def getAudioChunk(self):
         return self.yamlConfig["audio-chunk"]
+
+    def getAudioRate(self):
+        return self.yamlConfig["audio-rate"]

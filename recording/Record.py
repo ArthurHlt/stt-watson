@@ -11,8 +11,8 @@ from config.Config import Config
 class Record(threading.Thread):
     CHUNK = Config.Instance().getAudioChunk()
     FORMAT = pyaudio.paInt16
-    CHANNELS = 2
-    RATE = 44100
+    CHANNELS = 1
+    RATE = Config.Instance().getAudioRate()
     stopper = None
 
     def __init__(self, writer, stopper):
