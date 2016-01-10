@@ -10,7 +10,7 @@ setup(
     author='Arthur Halet',
     author_email='arthurh.halet@gmail.com',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
-    description='Speech to text using watson in python with websocket and record from microphone',
+    description='Speech to text using watson in python with websocket and record from microphone.',
     platforms='ALL',
     install_requires=[
         'autobahn>=0.10.9',
@@ -21,6 +21,9 @@ setup(
         'pyaudio>=0.2.9',
         'pyyaml>=3.08',
     ],
+    package_data={
+        'config': ['config.sample.yml']
+    },
     entry_points={
         'console_scripts': [
             'stt-watson=stt_watson.__main__:main',

@@ -9,10 +9,7 @@ from config.Config import Config
 
 
 class Record(threading.Thread):
-    CHUNK = Config.Instance().getAudioChunk()
     FORMAT = pyaudio.paInt16
-    CHANNELS = Config.Instance().getChannels()
-    RATE = Config.Instance().getAudioRate()
     stopper = None
 
     def __init__(self, stopper):
@@ -20,19 +17,22 @@ class Record(threading.Thread):
         self.p = pyaudio.PyAudio()
         self.writer = None
         self.stopper = stopper
+        self.channels = Config.Instance().getChannels()
+        self.rate = Config.Instance().getAudioRate()
+        self.chunk = Config.Instance().getAudioChunk()
 
     def recording(self):
         if self.writer is None:
             raise Exception("You need to pass a fd to write data")
         stream = self.p.open(format=self.FORMAT,
-                             channels=self.CHANNELS,
-                             rate=self.RATE,
+                             channels=self.channels,
+                             rate=self.rate,
                              input=True,
-                             frames_per_buffer=self.CHUNK)
+                             frames_per_buffer=self.chunk)
 
         print("* recording")
         while not self.stopper.is_set():
-            os.write(self.writer, stream.read(self.CHUNK, False))
+            os.write(self.writer, stream.read(self.chunk, False))
         stream.stop_stream()
         stream.close()
         self.p.terminate()

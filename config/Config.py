@@ -1,6 +1,4 @@
 import yaml
-from utils.Singleton import Singleton
-import yaml
 import os.path
 from utils.Singleton import Singleton
 
@@ -16,10 +14,12 @@ class Config:
 
     def loadConfigFile(self):
         if not os.path.isfile(self.configFile):
-            print "Warning: config file '" + self.configFile + "' not found"
             return
         streamConfig = file(self.configFile, 'r')
-        self.yamlConfig = yaml.load(streamConfig)
+        self.loadConfigFromResource(streamConfig)
+
+    def loadConfigFromResource(self, resource):
+        self.yamlConfig = yaml.load(resource)
 
     def setConfigFile(self, configFile):
         self.configFile = configFile
@@ -30,8 +30,13 @@ class Config:
 
     def getConfigKey(self, key):
         if key not in self.yamlConfig:
+            if not os.path.isfile(self.configFile):
+                raise Exception("Config file '" + self.configFile + "' not found.")
             raise Exception("Value for '" + key + "' not found.")
         return self.yamlConfig[key]
+
+    def getConfig(self):
+        return self.yamlConfig
 
     def setConfigKey(self, key, value):
         self.yamlConfig[key] = value
