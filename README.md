@@ -29,6 +29,12 @@ from stt_watson.SttWatsonAbstractListener import SttWatsonAbstractListener
 
 """
 Example of listener to use data given by stt-watson (stt-watson notify hypothesis to his listeners when he receive it)
+
+Hypothesis format:
+{
+    'confidence': '0.1' // confidence of the sentence or words if exist
+    'transcript': 'the transcription of your voice'
+}
 """
 class MyListener(SttWatsonAbstractListener):
     def __init__(self):
