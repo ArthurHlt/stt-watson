@@ -5,7 +5,7 @@ Speech to text using watson in python with websocket and record from microphone
 
 - **Python 2.7**
 - **Pip**
-- (if under mac) **portaudio**, can be installed with `brew install portaudio`
+- **portaudio**, can be installed with `brew install portaudio` (mac) or `apt-get install portaudio19-dev`(linux)
 
 ## Installation
 
