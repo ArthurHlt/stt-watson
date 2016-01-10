@@ -19,8 +19,6 @@ Simply run in command line: `stt-watson`
 
 ## Usage for developers
 
-** You first need a `config.yml` located in the root of your project (this can be override, look at: [Config class](/config/Config.py) )**
-
 Bootstrap example:
 
 ```python
