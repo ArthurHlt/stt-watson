@@ -33,7 +33,8 @@ def main():
 
     Config.Instance().setConfigFile(args.configFile)
     sttWatsonLogListener = SttWatsonLogListener()
-    sttWatson = SttWatson()
+    watsonConfig = Config.Instance().getWatsonConfig()
+    sttWatson = SttWatson(watsonConfig["user"], watsonConfig["password"])
     sttWatson.addListener(sttWatsonLogListener)
     sttWatson.run()
 

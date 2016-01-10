@@ -58,7 +58,7 @@ class MyListener(SttWatsonAbstractListener):
 
 
 myListener = MyListener()
-sttWatson = SttWatson()
+sttWatson = SttWatson('watson_user', 'watson_password')
 sttWatson.addListener(myListener)
 sttWatson.run()
 ```

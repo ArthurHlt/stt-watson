@@ -38,6 +38,9 @@ class Config:
     def getConfig(self):
         return self.yamlConfig
 
+    def setConfig(self, config):
+        self.yamlConfig = config
+
     def setConfigKey(self, key, value):
         self.yamlConfig[key] = value
 
