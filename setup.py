@@ -11,6 +11,11 @@ setup(
     author_email='arthurh.halet@gmail.com',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
     description='Speech to text using watson in python with websocket and record from microphone.',
+    keywords='text-to-speech watson websocket',
+    classifiers=['Topic :: Multimedia :: Sound/Audio :: Analysis',
+                 'Topic :: Multimedia :: Sound/Audio :: Capture/Recording',
+                 'Topic :: Software Development :: Libraries',
+                 'License :: OSI Approved :: MIT License'],
     platforms='ALL',
     install_requires=[
         'autobahn>=0.10.9',
