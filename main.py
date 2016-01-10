@@ -2,7 +2,6 @@ from recording.Record import Record
 from watson_client.Client import Client
 from utils.SignalHandler import SignalHandler
 import os
-import sys
 import signal
 import threading
 

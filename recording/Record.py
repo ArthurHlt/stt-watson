@@ -15,13 +15,15 @@ class Record(threading.Thread):
     RATE = Config.Instance().getAudioRate()
     stopper = None
 
-    def __init__(self, writer, stopper):
+    def __init__(self, stopper):
         threading.Thread.__init__(self)
         self.p = pyaudio.PyAudio()
-        self.writer = writer
+        self.writer = None
         self.stopper = stopper
 
     def recording(self):
+        if self.writer is None:
+            raise Exception("You need to pass a fd to write data")
         stream = self.p.open(format=self.FORMAT,
                              channels=self.CHANNELS,
                              rate=self.RATE,
@@ -36,16 +38,11 @@ class Record(threading.Thread):
         self.p.terminate()
         print 'finished recording'
 
-    def write_wav_file(self, data):
-        buffer = StringIO.StringIO()
-        wf = wave.open(buffer, 'wb')
-        wf.setnchannels(self.CHANNELS)
-        wf.setsampwidth(self.p.get_sample_size(self.FORMAT))
-        wf.setframerate(self.RATE)
-        wf.writeframes(data)
-        wf.close()
-        buffer.flush()
-        return buffer.getvalue()
+    def setWriter(self, writer):
+        self.writer = writer
+
+    def getWriter(self):
+        return self.writer
 
     def run(self):
         self.recording()

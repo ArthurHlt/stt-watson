@@ -1,4 +1,7 @@
 /output/*.json.txt
 /output.wav
 /config.yml
+/dist
+/build
+/*.egg-info
 *.pyc

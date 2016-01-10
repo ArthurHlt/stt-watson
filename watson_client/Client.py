@@ -35,7 +35,14 @@ class Client:
     CONTENT_TYPE = 'audio/l16;rate=44100'
 
     def __init__(self):
+        self.listeners = []
         self.configData = Config.Instance().getWatsonConfig()
+
+    def setListeners(self, listeners):
+        self.listeners = listeners
+
+    def getListeners(self):
+        return self.listeners
 
     def startStt(self, audioFd):
 
@@ -65,6 +72,7 @@ class Client:
                                      url,
                                      headers,
                                      debug=True)
+        factory.setListeners(self.listeners)
         factory.protocol = WSInterfaceProtocol
 
         if factory.isSecure:

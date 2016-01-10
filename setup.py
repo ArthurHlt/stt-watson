@@ -1,0 +1,29 @@
+from setuptools import setup, find_packages
+import os
+
+setup(
+    name='stt-watson',
+    version='1.0.0',
+    packages=['utils', 'config', 'recording', 'watson_client', 'watson_client.websocket', 'stt_watson'],
+    url='https://github.com/HomeHabbit/stt-watson',
+    license='MIT',
+    author='Arthur Halet',
+    author_email='arthurh.halet@gmail.com',
+    long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
+    description='Speech to text using watson in python with websocket and record from microphone',
+    platforms='ALL',
+    install_requires=[
+        'autobahn>=0.10.9',
+        'pyOpenSSL>=0.13.1',
+        'requests>=2.8.1',
+        'Twisted>=13.2.0',
+        'txaio>=2.0.4',
+        'pyaudio>=0.2.9',
+        'pyyaml>=3.08',
+    ],
+    entry_points={
+        'console_scripts': [
+            'stt-watson=stt_watson.__main__:main',
+        ],
+    },
+)

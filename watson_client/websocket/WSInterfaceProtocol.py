@@ -11,6 +11,7 @@ from config.Config import Config
 # note: an object of this class is created for each WebSocket connection, every time we call connectWS
 class WSInterfaceProtocol(WebSocketClientProtocol):
     def __init__(self, factory, audioFd, summary, contentType):
+        self.listeners = []
         self.audioFd = audioFd
         self.factory = factory
         self.summary = summary
@@ -22,6 +23,12 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
         self.chunkSize = Config.Instance().getAudioChunk()  # in bytes
         super(self.__class__, self).__init__()
         print "contentType: " + str(self.contentType)
+
+    def setListeners(self, listeners):
+        self.listeners = listeners
+
+    def getListeners(self):
+        return self.listeners
 
     def setUtterance(self):
 
@@ -62,7 +69,7 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
         if isBinary:
             print("Binary message received: {0} bytes".format(len(payload)))
         else:
-            print(u"Text message received: {0}".format(payload.decode('utf8')))
+            # print(u"Text message received: {0}".format(payload.decode('utf8')))
 
             # if uninitialized, receive the initialization response from the server
             jsonObject = json.loads(payload.decode('utf8'))
@@ -82,14 +89,35 @@ class WSInterfaceProtocol(WebSocketClientProtocol):
                     print "empty hypothesis!"
                 # regular hypothesis
                 else:
-
                     hypothesis = jsonObject['results'][0]['alternatives'][0]['transcript']
                     bFinal = (jsonObject['results'][0]['final'] == True)
+                    transcripts = self.extractTranscripts(jsonObject['results'][0]['alternatives'])
+
                     if bFinal:
-                        print "final hypothesis: \"" + hypothesis + "\""
+                        self.notifyListeners(payload.decode('utf8'), transcripts)
+                        # print "final hypothesis: \"" + hypothesis + "\""
                         self.summary['hypothesis'] += hypothesis
                     else:
-                        print "interim hyp: \"" + hypothesis + "\""
+                        self.notifyListeners(payload.decode('utf8'), None, transcripts)
+                        # print "interim hyp: \"" + hypothesis + "\""
+
+    def extractTranscripts(self, alternatives):
+        transcripts = []
+        for alternative in alternatives:
+            transcript = {}
+            if 'confidence' in alternative:
+                transcript['confidence'] = alternative['confidence']
+            transcript['transcript'] = alternative['transcript']
+            transcripts.append(transcript)
+        return transcripts
+
+    def notifyListeners(self, payload, hypothesis=None, interimHypothesis=None):
+        for listener in self.listeners:
+            listener.listenPayload(payload)
+            if hypothesis is not None:
+                listener.listenHypothesis(hypothesis)
+            if interimHypothesis is not None:
+                listener.listenInterimHypothesis(interimHypothesis)
 
     def onClose(self, wasClean, code, reason):
 
