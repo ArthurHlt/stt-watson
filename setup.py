@@ -10,7 +10,7 @@ setup(
     author='Arthur Halet',
     author_email='arthurh.halet@gmail.com',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.md')).read(),
-    description='Speech to text using watson in python with websocket and record from microphone.',
+    description='Continuous speech to text using watson in python with websocket and record from microphone',
     keywords='text-to-speech watson websocket',
     classifiers=['Topic :: Multimedia :: Sound/Audio :: Analysis',
                  'Topic :: Multimedia :: Sound/Audio :: Capture/Recording',
