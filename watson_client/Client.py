@@ -71,7 +71,7 @@ class Client:
                                      self.configData["model"],
                                      url,
                                      headers,
-                                     debug=True)
+                                     debug=False)
         factory.setListeners(self.listeners)
         factory.protocol = WSInterfaceProtocol
 

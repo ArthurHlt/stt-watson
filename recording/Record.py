@@ -1,10 +1,10 @@
 """PyAudio example: Record a few seconds of audio and save to a WAVE file."""
 
-import pyaudio
-import wave
 import os
 import threading
-import StringIO
+
+import pyaudio
+
 from config.Config import Config
 
 
@@ -20,6 +20,7 @@ class Record(threading.Thread):
         self.channels = Config.Instance().getChannels()
         self.rate = Config.Instance().getAudioRate()
         self.chunk = Config.Instance().getAudioChunk()
+        self.pauseRecord = False
 
     def recording(self):
         if self.writer is None:
@@ -32,11 +33,19 @@ class Record(threading.Thread):
 
         print("* recording")
         while not self.stopper.is_set():
+            if self.pauseRecord:
+                continue
             os.write(self.writer, stream.read(self.chunk, False))
         stream.stop_stream()
         stream.close()
         self.p.terminate()
         print 'finished recording'
+
+    def pauseRecord(self):
+        self.pauseRecord = True
+
+    def continuRecord(self):
+        self.pauseRecord = False
 
     def setWriter(self, writer):
         self.writer = writer

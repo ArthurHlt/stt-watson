@@ -1,14 +1,16 @@
-import yaml
 import os.path
+
+import yaml
+
 from utils.Singleton import Singleton
 
 
 @Singleton
 class Config:
-    DEFAULT_CONFIG_FILE = "./config.yml"
+    DEFAULT_CONFIG_FILE = "./config-stt-watson.yml"
 
     def __init__(self):
-        self.yamlConfig = {}
+        self.yamlConfig = {'watson-stt': {}}
         self.configFile = None
         self.setConfigFile(self.DEFAULT_CONFIG_FILE)
 

@@ -1,9 +1,10 @@
-from setuptools import setup, find_packages
 import os
+
+from setuptools import setup
 
 setup(
     name='stt-watson',
-    version='1.0.1',
+    version='1.0.3',
     packages=['utils', 'config', 'recording', 'watson_client', 'watson_client.websocket', 'stt_watson'],
     url='https://github.com/HomeHabbit/stt-watson',
     license='MIT',

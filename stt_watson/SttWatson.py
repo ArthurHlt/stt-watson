@@ -1,11 +1,12 @@
-from recording.Record import Record
-from watson_client.Client import Client
-from utils.SignalHandler import SignalHandler
-from stt_watson.SttWatsonAbstractListener import SttWatsonAbstractListener
-from config.Config import Config
 import os
 import signal
 import threading
+
+from config.Config import Config
+from recording.Record import Record
+from stt_watson.SttWatsonAbstractListener import SttWatsonAbstractListener
+from utils.SignalHandler import SignalHandler
+from watson_client.Client import Client
 
 
 class SttWatson:
@@ -48,6 +49,12 @@ class SttWatson:
         if not isinstance(listener, SttWatsonAbstractListener):
             raise Exception("Listener added is not a derived class from SttWatsonAbstractListener")
         self.listeners.append(listener)
+
+    def pauseRecord(self):
+        self.record.pauseRecord()
+
+    def continuRecord(self):
+        self.record.continuRecord()
 
     def setListeners(self, listeners):
         if listeners is not list:
